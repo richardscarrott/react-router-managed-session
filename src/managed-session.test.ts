@@ -1,10 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { createManagedSession } from "./managed-session";
 import {
   createCookie,
   createCookieSessionStorage,
   isSession,
 } from "react-router";
+import { createManagedSession } from "./managed-session";
 
 describe(createManagedSession, () => {
   describe("finalizeSession", () => {
