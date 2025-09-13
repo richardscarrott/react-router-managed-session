@@ -1,7 +1,7 @@
 {
   "name": "react-router-managed-session",
   "version": "0.0.1",
-  "description": "A managed session utility for React Router framework mode (formerly Remix) that automatically handles session commits and destroys",
+  "description": "A session utility for React Router framework mode (formerly Remix) that simplifies session handling in middleware/loaders/actions",
   "main": "./dist/managed-session.js",
   "module": "./dist/managed-session.js",
   "types": "./dist/managed-session.d.ts",

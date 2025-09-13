@@ -1,12 +1,15 @@
 # React Router Managed Session
 
-A managed session utility for React Router framework mode (formerly Remix) that automatically handles session commits and destroys with optional rolling support.
+A session utility for React Router framework mode (formerly Remix) that simplifies session handling in middleware/loaders/actions.
+
+[![npm version](https://img.shields.io/npm/v/react-router-managed-session?style=flat-square)](https://www.npmjs.com/package/react-router-managed-session)
+[![license](https://img.shields.io/npm/l/react-router-managed-session?style=flat-square)](https://github.com/richard-scarrott/react-router-managed-session/blob/main/LICENSE)
 
 ## Features
 
-- 🔄 Automatic session management (no manual commit/destroy in each handler)
-- 🤝 Singleton session instance shared across all loaders/actions
-- 🎯 Smart session handling (commit only when data changes, destroy if empty)
+- 🔄 Automatic session management (no manual commit or destroy in each handler)
+- 🤝 Singleton session instance shared across all middleware/loaders/actions
+- 🎯 Smart session handling (commits only when data changes, destroys if empty)
 - ⏰ Optional rolling sessions to keep users signed in while active
 - 🔒 Type-safe (full TypeScript support)
 - 🪶 Lightweight (no extra runtime deps)
@@ -21,7 +24,7 @@ npm add react-router-managed-session
 
 ### Middleware
 
-React Router Middleware is the preferred way to use managed sessions. It's an ideal place to set up the session once and use the same instance everywhere without boilerplate.
+[React Router Middleware](https://reactrouter.com/how-to/middleware) is the preferred way to use managed sessions. It's an ideal place to set up the session once and use the same instance everywhere.
 
 #### 1) Enable middleware
 
@@ -31,7 +34,7 @@ import type { Config } from "@react-router/dev/config";
 
 export default {
   future: {
-    unstable_middleware: true,
+    v8_middleware: true,
   },
 } satisfies Config;
 ```
@@ -40,15 +43,14 @@ export default {
 
 ```ts
 // app/context.ts
-import { unstable_createContext } from "react-router";
+import { createContext } from "react-router";
 import type { ManagedSession } from "react-router-managed-session";
 
 type SessionData = {
   userId?: string;
 };
 
-export const sessionContext =
-  unstable_createContext<ManagedSession<SessionData>>();
+export const sessionContext = createContext<ManagedSession<SessionData>>();
 ```
 
 #### 3) Create session middleware
@@ -94,9 +96,7 @@ Register the middleware on routes (typically near the root so it applies broadly
 // app/root.tsx (or any route module)
 import { sessionMiddleware } from "~/middleware/session";
 
-export const unstable_middleware: Route.unstable_MiddlewareFunction[] = [
-  sessionMiddleware,
-];
+export const middleware: Route.MiddlewareFunction[] = [sessionMiddleware];
 ```
 
 #### 4) Use it in loaders/actions (no boilerplate!)
@@ -128,6 +128,7 @@ export async function action({ context, request }: Route.ActionArgs) {
     throw redirect("/login");
   }
 
+  // If session changed anywhere, middleware will commit it automatically
   return json({ ok: true });
 }
 ```
@@ -166,10 +167,9 @@ app.all("*", (c) => {
     rolling: true, // keep sessions alive for active users (optional)
   });
 
-  const response = reactRouter({
+  const response = await reactRouter({
     build,
     mode: process.env.NODE_ENV,
-    // getLoadContext is optional, the default function is the same as here
     getLoadContext() {
       // Provide the session to downstream loaders/actions
       return { session };
@@ -182,7 +182,6 @@ app.all("*", (c) => {
   return response;
 });
 
-// Create a Cloudflare Pages request handler for your Hono server
 export const onRequest = handle(server);
 ```
 
