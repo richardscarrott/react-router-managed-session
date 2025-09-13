@@ -1,0 +1,32 @@
+# Source files
+src/
+
+# Config files
+tsconfig.json
+vitest.config.ts
+.gitignore
+
+# Development dependencies
+node_modules/
+
+# Test files
+*.test.ts
+*.test.js
+
+# Build artifacts (not needed in npm)
+*.tsbuildinfo
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Coverage reports
+coverage/

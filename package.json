@@ -1,18 +1,42 @@
 {
   "name": "react-router-managed-session",
-  "version": "1.0.0",
-  "main": "index.js",
+  "version": "0.0.1",
+  "description": "A session utility for React Router framework mode (formerly Remix) that simplifies session handling in middleware/loaders/actions",
+  "main": "./dist/managed-session.js",
+  "module": "./dist/managed-session.js",
+  "types": "./dist/managed-session.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/managed-session.d.ts",
+      "import": "./dist/managed-session.js",
+      "require": "./dist/managed-session.js"
+    }
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prebuild": "rm -rf dist",
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build && npm run test"
   },
   "author": "",
-  "license": "ISC",
-  "description": "",
+  "license": "MIT",
+  "dependencies": {
+    "react-router": "^7.0.0"
+  },
   "devDependencies": {
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"
   },
-  "dependencies": {
-    "react-router": "^7.8.0"
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "package.json"
+  ],
+  "repository": {
+    "type": "git",
+    "url": ""
   }
 }
