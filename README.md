@@ -3,7 +3,7 @@
 A session utility for React Router framework mode (formerly Remix) that simplifies session handling in middleware/loaders/actions.
 
 [![npm version](https://img.shields.io/npm/v/react-router-managed-session?style=flat-square)](https://www.npmjs.com/package/react-router-managed-session)
-[![license](https://img.shields.io/npm/l/react-router-managed-session?style=flat-square)](https://github.com/richard-scarrott/react-router-managed-session/blob/main/LICENSE)
+[![license](https://img.shields.io/npm/l/react-router-managed-session?style=flat-square)](https://github.com/richardscarrott/react-router-managed-session/blob/main/LICENSE)
 
 ## Features
 
@@ -58,10 +58,17 @@ export const sessionContext = createContext<ManagedSession<SessionData>>();
 ```ts
 // app/middleware/session.ts
 import { createManagedSession } from "react-router-managed-session";
-import { createCookie, createCookieSessionStorage } from "react-router";
+import {
+  createCookie,
+  createCookieSessionStorage,
+  type MiddlewareFunction,
+} from "react-router";
 import { sessionContext } from "~/context";
 
-export async function sessionMiddleware({ request, context }, next) {
+export const sessionMiddleware: MiddlewareFunction<Response> = async (
+  { request, context },
+  next
+) => {
   // Create session storage (any session storage works)
   const cookie = createCookie("__session", {
     maxAge: 60 * 60 * 24, // 24 hours
@@ -87,7 +94,7 @@ export async function sessionMiddleware({ request, context }, next) {
   await finalizeSession(response);
 
   return response;
-}
+};
 ```
 
 Register the middleware on routes (typically near the root so it applies broadly):
@@ -104,7 +111,7 @@ export const middleware: Route.MiddlewareFunction[] = [sessionMiddleware];
 ```ts
 // app/routes/dashboard.tsx
 import { sessionContext } from "~/context";
-import { json, redirect } from "react-router";
+import { redirect } from "react-router";
 
 export async function loader({ context }: Route.LoaderArgs) {
   const session = context.get(sessionContext);
@@ -115,7 +122,7 @@ export async function loader({ context }: Route.LoaderArgs) {
   }
 
   // If session changed anywhere, middleware will commit it automatically
-  return json({ userId });
+  return { userId };
 }
 
 export async function action({ context, request }: Route.ActionArgs) {
@@ -129,7 +136,7 @@ export async function action({ context, request }: Route.ActionArgs) {
   }
 
   // If session changed anywhere, middleware will commit it automatically
-  return json({ ok: true });
+  return { ok: true };
 }
 ```
 
@@ -190,7 +197,7 @@ export const onRequest = handle(server);
 ```ts
 // app/routes/dashboard.tsx
 import { sessionContext } from "~/context";
-import { json, redirect } from "react-router";
+import { redirect } from "react-router";
 
 export async function loader({ context }: Route.LoaderArgs) {
   const session = context.session;
@@ -201,7 +208,7 @@ export async function loader({ context }: Route.LoaderArgs) {
   }
 
   // If session changed anywhere, middleware will commit it automatically
-  return json({ userId });
+  return { userId };
 }
 
 export async function action({ context, request }: Route.ActionArgs) {
@@ -214,7 +221,7 @@ export async function action({ context, request }: Route.ActionArgs) {
     throw redirect("/login");
   }
 
-  return json({ ok: true });
+  return { ok: true };
 }
 ```
 
